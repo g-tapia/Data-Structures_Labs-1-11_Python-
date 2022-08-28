@@ -1,0 +1,118 @@
+class OrderedHashtable:
+    class Node:
+        """This class is used to create nodes in the singly linked "chains" in
+        each hashtable bucket."""
+        def __init__(self, index, next=None):
+            # don't rename the following attributes!
+            self.index = index
+            self.next = next
+        
+    def __init__(self, n_buckets=1000):
+        # the following two variables should be used to implement the "two-tiered" 
+        # ordered hashtable described in class -- don't rename them!
+        self.indices = [None] * n_buckets
+        self.entries = []
+        self.count = 0
+        
+    def __getitem__(self, key):
+        idx = hash(key) % len(self.indices)
+        temp = self.indices[idx]
+        while temp is not None:
+            if self.entries[temp.index][0] == key:
+                return self.entries[temp.index][1]
+            temp = temp.next
+        raise KeyError()
+ 
+    def __setitem__(self, key, val):
+        tableindex = hash(key) % len(self.indices)
+        idx = len(self.entries)
+        if self.indices[tableindex] is None:
+            self.entries.append([key, val])
+            self.count += 1
+            self.indices[tableindex] = OrderedHashtable.Node(idx, None)       
+        else:
+            temp_value = self.indices[tableindex]
+            while temp_value:
+                n = self.entries[temp_value.index]
+                if n[0] == key:
+                    n[1] = val
+                    return
+                if temp_value.next is None:
+                    self.entries.append([key, val])
+                    temp_value.next = OrderedHashtable.Node(idx, None)
+                    self.count += 1
+                    return;
+                temp_value = temp_value.next
+                
+    def __delitem__(self, key):
+        deletedindex = None        
+        hashindex = hash(key) % len(self.indices)
+        temp= self.indices[hashindex]
+        if self.entries[temp.index][0] == key:
+            self.count -= 1
+            del self.entries[temp.index]
+            deletedindex = temp.index
+            if temp.next is not None:
+                self.indices[hashindex] = temp.next
+            else:
+                self.indices[hashindex] = None
+                
+            for bucket in self.indices:
+                temp = bucket
+                while temp is not None:
+                    if temp.index > deletedindex:
+                        temp.index -= 1
+                    temp = temp.next                
+        else:
+            while temp.next is not None:
+                last_node = temp
+                temp = temp.next
+                if self.entries[temp.index][0] == key:
+                    self.count -= 1
+                    del self.entries[temp.index]
+                    deletedindex = temp.index
+                    last_node.next = temp.next
+                    break
+            else:
+                raise KeyError()
+
+            for bucket in self.indices:
+                temp = bucket
+                while temp is not None:
+                    if temp.index > deletedindex:
+                        temp.index -= 1
+                    temp = temp.next        
+        
+    def __contains__(self, key):
+        try:
+            _ = self[key]
+            return True
+        except:
+            return False
+        
+    def __len__(self):
+        return self.count
+    
+    def __iter__(self):
+        for x in self.entries:
+            yield x[0]
+        raise NotImplementedError()    
+        
+    def keys(self):
+        return iter(self)
+    
+    def values(self):
+        for x in self.entries:
+            yield x[1]
+        raise NotImplementedError()
+        
+                
+    def items(self):
+        for x in self.entries:
+            yield tuple(x)           
+                
+    def __str__(self):
+        return '{ ' + ', '.join(str(k) + ': ' + str(v) for k, v in self.items()) + ' }'
+            
+    def __repr__(self):
+        return str(self)
