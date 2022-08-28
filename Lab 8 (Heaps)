@@ -1,0 +1,89 @@
+class Heap:
+    def __init__(self, key=lambda x:x):
+        self.data = []
+        self.key  = key
+
+    @staticmethod
+    def _parent(idx):
+        return (idx-1)//2
+        
+    @staticmethod
+    def _left(idx):
+        return idx*2+1
+
+    @staticmethod
+    def _right(idx):
+        return idx*2+2
+    
+    def heapify(self, idx=0):
+        l=self._left(idx)
+        r=self._right(idx)
+        greatest=idx
+        if l <len(self.data) and self.key(self.data[l]) > self.key(self.data[idx]):
+            greatest=l
+        if r <len(self.data) and self.key(self.data[r]) > self.key(self.data[greatest]):
+            greatest=r
+        if( greatest!=idx):
+            temp=self.data[idx]
+            self.data[idx]=self.data[greatest]
+            self.data[greatest]=temp
+            self.heapify(greatest) 
+            
+    def add(self, x):
+        self.data.append(x)
+        count=len(self.data)-1
+        while count > 0 and self.key(self.data[self._parent(count)]) < self.key(self.data[count]):
+            temp=self.data[count]
+            self.data[count]=self.data[self._parent(count)]
+            self.data[self._parent(count)]=temp
+            count=self._parent(count)
+        
+    def peek(self):
+        return self.data[0]
+
+    def pop(self):
+        ret = self.data[0]
+        self.data[0] = self.data[len(self.data)-1]
+        del self.data[len(self.data)-1]
+        self.heapify()
+        return ret
+    
+    def __bool__(self):
+        return len(self.data) > 0
+
+    def __len__(self):
+        return len(self.data)
+
+    def __repr__(self):
+        return repr(self.data)
+     
+ def running_medians(iterable):
+    min_heap=Heap(lambda x:-x)
+    max_heap=Heap()
+    medianValues = []
+    medianVal=0
+    for i, x in enumerate(iterable):
+        if x>=medianVal:
+            min_heap.add(x)
+        else:
+            max_heap.add(x)
+            
+        if (len(min_heap.data)-len(max_heap.data))> 1:
+            pop_value=min_heap.pop()
+            max_heap.add(pop_value)
+        elif (len(max_heap.data) - len(min_heap.data))> 1:
+            pop_value=max_heap.pop()
+            min_heap.add(pop_value)
+
+        if len(min_heap.data) == len(max_heap.data):
+            medianVal=(min_heap.peek()+max_heap.peek())/2
+
+        elif (len(min_heap.data)-len(max_heap.data))== 1:
+            medianVal=min_heap.peek()
+
+        elif (len(max_heap.data) - len(min_heap.data))== 1:
+            medianVal=max_heap.peek()
+            
+        medianValues.append(medianVal)
+
+    return medianValues
