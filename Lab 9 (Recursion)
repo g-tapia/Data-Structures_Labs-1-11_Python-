@@ -1,0 +1,44 @@
+def super_digit(n):
+    if (n < 10):
+        return n
+    else:
+        total = 0
+        while n > 0:
+            total += n % 10
+            n //= 10
+        return super_digit(total)
+        
+    
+def pascal(row,column):
+    if (column == 0 or column == row):
+        return 1
+    else:
+        return pascal(row-1,column-1) + pascal(row-1,column)
+    
+def can_make_product(p, vals):
+    for x in range(len(vals)):
+        num = vals[x]
+        if num == p or (p % num == 0 and can_make_product(p // num, vals[:x] + vals[x + 1:])):
+            return True
+    else:
+        return False
+        
+def deciding_votes_per_block(blocks):
+    to_return=[]
+    for i in range(len(blocks)):
+        tocheck=blocks.pop()
+        to_return.append(deciding_votes_particular_block(blocks,tocheck))
+        blocks.insert(0, tocheck)
+    to_return.reverse()
+    return to_return
+        
+
+def deciding_votes_particular_block(blocks1,tocheck, for_votes=0, against_votes=0):
+    if not blocks1 and ((tocheck + for_votes) < against_votes or (tocheck+against_votes) < for_votes):
+        return 0
+    elif not blocks1:
+        if ((tocheck+for_votes) >= against_votes ) or ((tocheck+against_votes) >= for_votes):
+            return 1
+    else:
+        num=blocks1[0]
+        return deciding_votes_particular_block(blocks1[1:],tocheck,for_votes+num,against_votes) + deciding_votes_particular_block(blocks1[1:],tocheck,for_votes,against_votes+num)
