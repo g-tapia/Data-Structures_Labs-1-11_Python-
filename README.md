@@ -1,5 +1,5 @@
 # Data-Structures-Labs-1-11-Python-
-This repository contains all the labs from my Data Structures course. Unfortunately, I was not able to download the zip labs from the mimir website so I will have to copy and paste the code instead.
+This repository contains all the labs from my Data Structures course. Unfortunately, I was not able to download the zip folder from the mimir website so I will have to copy and paste the code instead.
 
 I will also attach screen shots below:
 
